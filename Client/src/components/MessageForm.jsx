@@ -1,0 +1,37 @@
+import { useState } from 'react';
+
+import { messageService } from '../services/messageService.ts';
+import { useAuth } from './AuthProvider.tsx';
+
+export const MessageForm = ({ roomId }) => {
+  const [text, setText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { currentUser } = useAuth();
+  return (
+    <form
+      className="field is-horizontal"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        try {
+          setLoading(true);
+          await messageService.sendMessage(text, roomId, currentUser.id);
+        } catch {
+        } finally {
+          setText('');
+          setLoading(false);
+        }
+      }}
+    >
+      <input
+        type="text"
+        className="input"
+        placeholder="Enter a message"
+        value={text}
+        onChange={(event) => setText(event.target.value)}
+      />
+      <button className="button" disabled={text.length === 0 || loading}>
+        Send
+      </button>
+    </form>
+  );
+};
